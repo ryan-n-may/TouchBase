@@ -7,7 +7,17 @@ import kotlinx.serialization.json.Json
 typealias URL           = String
 typealias PhoneNumber   = String
 typealias Email         = String
-enum class SocialService {
+enum class Titles {
+    NA,
+    /** Regular Contacts **/
+    Email,
+    Mobile,
+    WorkPhone,
+    HomePhone,
+    /** Relationship **/
+    Company,
+    Relationship,
+    /** Social Services **/
     Facebook,
     Instagram,
     Twitter,
@@ -30,97 +40,19 @@ enum class Relation {
 }
 
 interface ContactField {
-    var Title : String
-}
-@Serializable
-data class ImageField(
-    override var Title  : String = "",
-    var Image           : String = ""
-) : ContactField {
-    fun serialize() : String {
-        return Json.encodeToString<ImageField>(this)
-    }
-    fun deserialise(serial : String) {
-        val decoded = Json.decodeFromString<ImageField>(serial)
-        this.Title = decoded.Title
-        this.Image = decoded.Image
-    }
+    var Title : Titles
 }
 @Serializable
 data class SimpleField(
-    override var Title  : String = "",
+    override var Title  : Titles = Titles.NA,
     var Content         : String = "",
 ) : ContactField {
     fun serialize() : String {
-        return Json.encodeToString<SimpleField>(this)
+        return "${Title}~$Content"
     }
-    fun deserialise(serial : String) {
-        val decoded = Json.decodeFromString<SimpleField>(serial)
-        this.Title = decoded.Title
-        this.Content = decoded.Content
-    }
-}
-@Serializable
-data class RelationField(
-    override var Title  : String = "",
-    var Relationship    : Relation = Relation.Other
-) : ContactField {
-    fun serialize() : String {
-        return Json.encodeToString<RelationField>(this)
-    }
-    fun deserialise(serial : String) {
-        val decoded = Json.decodeFromString<RelationField>(serial)
-        this.Title = decoded.Title
-        this.Relationship = decoded.Relationship
-    }
-}
-@Serializable
-data class PhoneNumberField(
-    override var Title  : String = "",
-    var Description     : String = "",
-    var Phone           : PhoneNumber = ""
-) : ContactField {
-    fun serialize() : String {
-        return Json.encodeToString<PhoneNumberField>(this)
-    }
-    fun deserialise(serial : String) {
-        val decoded = Json.decodeFromString<PhoneNumberField>(serial)
-        this.Title = decoded.Title
-        this.Description = decoded.Description
-        this.Phone = decoded.Phone
-    }
-}
-@Serializable
-data class EmailField(
-    override var Title  : String = "",
-    var Description     : String = "",
-    var EmailAddress    : Email = ""
-) : ContactField {
-    fun serialize() : String {
-        return Json.encodeToString<EmailField>(this)
-    }
-    fun deserialise(serial : String) {
-        val decoded = Json.decodeFromString<EmailField>(serial)
-        this.Title = decoded.Title
-        this.Description = decoded.Description
-        this.EmailAddress = decoded.EmailAddress
-    }
-}
-@Serializable
-data class SocialField(
-    override var Title  : String = "",
-    var Description     : String = "",
-    var Service         : SocialService = SocialService.Facebook,
-    var InternetAddress : URL = ""
-) : ContactField {
-    fun serialize() : String {
-        return Json.encodeToString<SocialField>(this)
-    }
-    fun deserialise(serial : String) {
-        val decoded = Json.decodeFromString<SocialField>(serial)
-        this.Title = decoded.Title
-        this.Description = decoded.Description
-        this.Service = decoded.Service
-        this.InternetAddress = decoded.InternetAddress
+    fun deserialize(serial : String) {
+        val split = serial.split("~")
+        this.Title = Titles.valueOf(split[0])
+        this.Content = split[1]
     }
 }

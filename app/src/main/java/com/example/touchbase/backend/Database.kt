@@ -1,17 +1,19 @@
 package com.example.touchbase.backend
 
+import android.util.Log
 import androidx.room.*
 
 class Converters {
     @TypeConverter
     fun toContactField(json : String) : SimpleField {
-        var newContactField = SimpleField()
-        newContactField.deserialise(json)
+        Log.d(TAG, "Deserializing simple field.")
+        val newContactField = SimpleField()
+        newContactField.deserialize(json)
         return newContactField
     }
-
     @TypeConverter
     fun fromContactField(field : SimpleField) : String {
+        Log.d(TAG, "Serializing simple field.")
         return field.serialize()
     }
 }
@@ -30,18 +32,22 @@ class CONTACT_TABLE(
 
 @Entity(tableName = FIELD_LIST)
 class FIELD_TABLE(
-    @PrimaryKey val id : Int,
+    @PrimaryKey(autoGenerate = true)
+    val fieldID: Int,
+    val id : Int,
     val field : SimpleField
 )
-
-@Database(entities = [CONTACT_TABLE::class, FIELD_TABLE::class], version = 1, exportSchema = true)
+@Database(entities = [CONTACT_TABLE::class, FIELD_TABLE::class], version = 1, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class CONTACT_DATABASE : RoomDatabase() {
     abstract fun getDAO() : CONTACT_DAO
 }
-
 @Dao
 interface CONTACT_DAO {
+    @Query("DELETE FROM $CONTACT_LIST")
+    fun clearContactList()
+    @Query("DELETE FROM $FIELD_LIST")
+    fun clearFieldList()
     /** Mutators **/
     // Insert new contact into database
     @Query("INSERT INTO $CONTACT_LIST (id, firstName, lastName, image, relation) " +
@@ -53,11 +59,19 @@ interface CONTACT_DAO {
         image       : String,
         relation    : String,
     )
+    @Query("DELETE FROM $CONTACT_LIST WHERE id == :id")
+    fun removeContact(
+        id   : Int?,
+    )
+    @Query("DELETE FROM $FIELD_LIST WHERE id == :id")
+    fun removeContactFields(
+        id   : Int?,
+    )
     // Insert new field into field table
     @Query("INSERT INTO $FIELD_LIST (id, field) " +
             "VALUES (:id, :field)")
     fun addNewField(
-        id      : Int?,
+        id      : Int,
         field   : SimpleField
     )
     /** Accessors **/
@@ -73,7 +87,7 @@ interface CONTACT_DAO {
     @Query("SELECT id FROM $CONTACT_LIST WHERE relation == :relation")
     fun getAllContacts_FilterByRelation(relation : String) : List<Int>
     /** Accessors that search for users **/
-    @Query("SELECT id from $CONTACT_LIST WHERE firstName == :searchName OR WHERE lastName == :searchName")
+    @Query("SELECT id from $CONTACT_LIST WHERE firstName == :searchName OR lastName == :searchName")
     fun searchByFirstOrLastName(searchName : String) : List<Int>
     /** Accessors that fetch a value by ID **/
     @Query("SELECT firstName from $CONTACT_LIST WHERE id == :id")

@@ -14,6 +14,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.touchbase.ui.screens.ContactsScreen
+import com.example.touchbase.ui.screens.ProfileScreen
 import com.example.touchbase.ui.theme.TouchBaseTheme
 import com.example.touchbase.viewmodel.TouchBaseViewModel
 
@@ -21,6 +22,7 @@ const val TAG = "MainActivity"
 
 sealed class Destination(val route: String){
     object ContactsScreen: Destination("Contacts")
+    object ProfileScreen: Destination("Profile")
 }
 
 class MainActivity : ComponentActivity() {
@@ -58,6 +60,7 @@ fun NavigationAppHost (navController: NavHostController, viewModel: TouchBaseVie
         startDestination = Destination.ContactsScreen.route
     ){
         composable(route = Destination.ContactsScreen.route){ ContactsScreen(navController,viewModel) }
+        composable(route = Destination.ProfileScreen.route){ ProfileScreen(navController,viewModel) }
     }
 }
 

@@ -23,6 +23,7 @@ class TouchBaseViewModel(context: Context) : ViewModel() {
     // Display Values
     var id by mutableIntStateOf(6595)
     var profile: ImageBitmap? by mutableStateOf(null)
+    var relation by mutableStateOf("Brother")
     var firstName by mutableStateOf("Test")
     var lastName by mutableStateOf("McTesterson")
     var phoneNumber by mutableStateOf("95968751")

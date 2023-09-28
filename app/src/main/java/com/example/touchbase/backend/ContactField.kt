@@ -42,6 +42,7 @@ enum class Relation {
 interface ContactField {
     var Title : Titles
 }
+
 @Serializable
 data class SimpleField(
     override var Title  : Titles = Titles.NA,

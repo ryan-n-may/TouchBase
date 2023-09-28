@@ -2,14 +2,19 @@ package com.example.touchbase.viewmodel
 
 import android.util.Log
 import android.content.Context
+import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
 import androidx.room.Room
 import com.example.touchbase.backend.*
+import com.example.touchbase.models.TouchBaseDisplayModel
 
 const val TAG = "TouchBaseViewModel"
 
 class TouchBaseViewModel(context: Context) : ViewModel() {
+
     private var db : CONTACT_DATABASE
+    var touchBaseContacts = mutableStateListOf<TouchBaseDisplayModel>()
+
     init {
         // Makes Database
         db = Room.databaseBuilder(
@@ -18,35 +23,40 @@ class TouchBaseViewModel(context: Context) : ViewModel() {
         ).allowMainThreadQueries().build()
     }
 
+    fun onEvent(event: TouchBaseEvent){
+        when(event){
+            TouchBaseEvent.TestEvent -> { Log.v(TAG,"Test Event") }
+        }
+    }
+
     fun testing(){
         Log.v(TAG, "Testing")
         /** Adding Contact to database **/
         Log.d(TAG, "Test: Adding person to database")
-        val dd = DatabaseDriver(this.db)
-        Log.d(TAG, "Clearning database before testing")
-        dd.clearDatabases()
-        if(dd.addNewContact("Ryan", "May", "", Relation.ImmediateFamily) &&
-            dd.addNewContact("Chantelle", "Machado", "", Relation.ImmediateFamily)){
-            Log.d(TAG,"Added new person to database")
-        }
-        if(!dd.addNewContact("Ryan", "May", "", Relation.ImmediateFamily)){
-            Log.d(TAG,"Unique constraint to database was successful")
-        }
-        /** Listing contacts in database **/
-        Log.d(TAG, "Test: Getting persons in database")
-        dd.logContacts(TAG)
-        /** Testing remove contact **/
-        Log.d(TAG, "Test: Removing first person in database")
-        val idOfFirstContact = dd.getContactList()[0].second
-        dd.removeContact(idOfFirstContact)
-        dd.logContacts(TAG)
-        /** Adding field to database **/
-        Log.d(TAG, "Test: adding a field to the database")
-        val idOfSecondContact = dd.getContactList()[0].second
-        val field = SimpleField(Titles.WorkPhone, "0479 105 458")
-        dd.addNewContactField(idOfSecondContact, field)
-        dd.logContactFields(TAG, idOfSecondContact)
-
+//        val dd = DatabaseDriver(this.db)
+//        Log.d(TAG, "Clearning database before testing")
+//        dd.clearDatabases()
+//        if(dd.addNewContact("Ryan", "May", "", Relation.ImmediateFamily) &&
+//            dd.addNewContact("Chantelle", "Machado", "", Relation.ImmediateFamily)){
+//            Log.d(TAG,"Added new person to database")
+//        }
+//        if(!dd.addNewContact("Ryan", "May", "", Relation.ImmediateFamily)){
+//            Log.d(TAG,"Unique constraint to database was successful")
+//        }
+//        /** Listing contacts in database **/
+//        Log.d(TAG, "Test: Getting persons in database")
+//        dd.logContacts(TAG)
+//        /** Testing remove contact **/
+//        Log.d(TAG, "Test: Removing first person in database")
+//        val idOfFirstContact = dd.getContactList()[0].second
+//        dd.removeContact(idOfFirstContact)
+//        dd.logContacts(TAG)
+//        /** Adding field to database **/
+//        Log.d(TAG, "Test: adding a field to the database")
+//        val idOfSecondContact = dd.getContactList()[0].second
+//        val field = SimpleField(Titles.WorkPhone, "0479 105 458")
+//        dd.addNewContactField(idOfSecondContact, field)
+//        dd.logContactFields(TAG, idOfSecondContact)
     }
 
 

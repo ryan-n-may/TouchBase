@@ -21,6 +21,7 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -173,6 +174,20 @@ fun BottomProfileBar(navController: NavHostController, viewmodel: TouchBaseViewM
                     }
             )
         }
+    }
+}
+
+@Composable
+fun profileField(label: String, content: () -> String, onValueChange: (String) -> Unit){
+    Row (
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(3.dp),
+        horizontalArrangement = Arrangement.Start,
+        verticalAlignment = Alignment.CenterVertically
+    ){
+        Text(text = "$label: ", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+        TextField(value = content(), onValueChange = onValueChange, Modifier.fillMaxWidth())
     }
 }
 

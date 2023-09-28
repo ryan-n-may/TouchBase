@@ -6,6 +6,13 @@ import kotlin.random.Random
 
 val TAG = "DatabaseDriver"
 
+data class Contact(
+    var id  : Int,
+    var firstName : String,
+    var lastName : String,
+    var image : String
+)
+
 class DatabaseDriver(db : CONTACT_DATABASE) {
     val db : CONTACT_DATABASE
     val dao : CONTACT_DAO
@@ -20,8 +27,8 @@ class DatabaseDriver(db : CONTACT_DATABASE) {
     fun logContacts(TAG : String){
         val contacts = this.getContactList()
         for(i in contacts.indices){
-            val triple = contacts[i]
-            Log.d(TAG, "> ${triple.first}, ${triple.second}, ${triple.third}")
+            val currentContract = contacts[i]
+            Log.d(TAG, "> ${currentContract.id}, ${currentContract.firstName}, ${currentContract.lastName}")
         }
     }
     fun logContactFields(TAG : String, id : Int){
@@ -54,9 +61,9 @@ class DatabaseDriver(db : CONTACT_DATABASE) {
     /**
      * Return a list of all contacts (first name + last name, ID, and image)
      */
-    fun getContactList() : MutableList<Triple<String, Int, String>>{
+    fun getContactList() : MutableList<Contact>{
         val listIDs = this.dao.getAllContacts_OrderByFirstNameDesc()
-        var listContacts : MutableList<Triple<String, Int, String>> = mutableListOf()
+        var listContacts : MutableList<Contact> = mutableListOf()
         var firstName   : String
         var lastName    : String
         var image       : String
@@ -66,7 +73,10 @@ class DatabaseDriver(db : CONTACT_DATABASE) {
             firstName   = this.dao.fetchFirstName(id)
             lastName    = this.dao.fetchLastName(id)
             image       = this.dao.fetchImage(id)
-            listContacts.add(Triple(firstName + " " + lastName, id, image))
+            var newContract = Contact(id, firstName, lastName, image)
+            /** Create contact obj here **/
+            /** Add contact obj to list instead of tripple **/
+            listContacts.add(newContract)
         }
         return listContacts
     }

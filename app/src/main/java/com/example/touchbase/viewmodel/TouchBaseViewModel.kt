@@ -12,86 +12,154 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.room.Room
 import com.example.touchbase.R
-import com.example.touchbase.backend.CONTACT_DATABASE
-import com.example.touchbase.models.TouchBaseDisplayModel
+import com.example.touchbase.backend.*
 
 const val TAG = "TouchBaseViewModel"
 
 class TouchBaseViewModel(context: Context) : ViewModel() {
 
     private var db : CONTACT_DATABASE
-    var touchBaseContacts = mutableStateListOf<TouchBaseDisplayModel>()
+    private var dao : CONTACT_DAO
+    private lateinit var dd : DatabaseDriver
 
     // Display Values
     var id by mutableIntStateOf(6595)
     var profile: Bitmap by mutableStateOf(BitmapFactory.decodeResource(context.resources, R.drawable.xavier))
-    var relation by mutableStateOf("Brother")
-    var firstName by mutableStateOf("Test")
-    var lastName by mutableStateOf("McTest")
-    var phoneNumber by mutableStateOf("95968751")
-    var email by mutableStateOf("TestEmail@Curtin.edu.au")
+
+    /**
+     * Mutable state for contact list
+     */
+    var touchBaseContactList = mutableStateListOf<Contact>()
+
+    /**
+     * Mutable state for field list
+     */
+    var currentContactFieldList = mutableStateListOf<SimpleField>()
+
+    /**
+     * Mutable states for removing items
+     */
+    var currentContactID = mutableStateOf(0)
+
+    /**
+     * Mutable states for adding a new contact to the database.
+     */
+    var newContactFirstName     by mutableStateOf("Ryan")
+    var newContactLastName      by mutableStateOf("May")
+    var newContactRelation      by mutableStateOf(Relation.ImmediateFamily)
+    var newContactImage         by mutableStateOf(BitmapFactory.decodeResource(context.resources, R.drawable.xavier))
+
+    /**
+     * Mutable states for adding a new field to the database.
+     */
+    var newFieldTitle       by mutableStateOf(Titles.Email)
+    var newFieldContents    by mutableStateOf("")
+    var currentContactField by mutableStateOf(SimpleField(Titles.NA, ""))
+
 
     init {
         Log.v(TAG,"TouchBase Viewmodel Loaded")
-        populateContactList(context)
         // Makes Database
-        db = Room.databaseBuilder(
+        this.db = Room.databaseBuilder(
             context,
             CONTACT_DATABASE::class.java, "contact-db"
         ).allowMainThreadQueries().build()
+        this.dao = this.db.getDAO()
+        this.dd = DatabaseDriver(this.db)
+        this.refreshContactList()
+        this.currentContactFieldList.clear()
     }
 
     fun onEvent(event: TouchBaseEvent){
         when(event){
-            TouchBaseEvent.AddContact -> { Log.v(TAG,"Add Contact Event") }
-            TouchBaseEvent.UpdateContact -> { Log.v(TAG,"Update Event") }
-            TouchBaseEvent.DeleteContact -> { Log.v(TAG,"Delete Event") }
-            TouchBaseEvent.CameraOpen -> { Log.v(TAG,"Camera Open Event") }
-            TouchBaseEvent.CameraTakePic -> { Log.v(TAG,"Camera Take Pic Event") }
-            is TouchBaseEvent.ProfileSelected -> { Log.v(TAG,"Profile Selected -> Id=${event.id}") }
+            TouchBaseEvent.AddContact -> {
+                Log.v(TAG,"Add Contact Event")
+                this.addContact()
+            }
+            TouchBaseEvent.UpdateContact -> {
+                Log.v(TAG,"Update Event")
+                this.refreshContactFields()
+            }
+            TouchBaseEvent.DeleteContact -> {
+                Log.v(TAG,"Delete Event")
+                this.removeContact()
+            }
+            TouchBaseEvent.CameraOpen -> {
+                Log.v(TAG,"Camera Open Event")
+            }
+            TouchBaseEvent.CameraTakePic -> {
+                Log.v(TAG,"Camera Take Pic Event")
+                this.updatePicture()
+            }
+            TouchBaseEvent.AddContactField -> {
+                Log.v(TAG,"Adding a contact field")
+                this.addContactField()
+            }
+            TouchBaseEvent.DeleteContactField -> {
+                Log.v(TAG,"Deleting a contact field")
+                this.deleteContactField()
+            }
+            is TouchBaseEvent.ProfileSelected -> {
+                Log.v(TAG,"Profile Selected -> Id=${event.id}")
+                this.currentContactID.value = event.id
+                this.refreshContactFields()
+            }
+        }
+    }
+    private fun updatePicture(){
+
+    }
+    private fun deleteContactField(){
+        this.dd.deleteContactField(this.currentContactID.value, this.currentContactField)
+        this.refreshContactFields()
+    }
+    private fun addContactField(){
+        val newField = SimpleField(
+            this.newFieldTitle,
+            this.newFieldContents
+        )
+        this.dd.addNewContactField(this.currentContactID.value, newField)
+        this.refreshContactFields()
+        this.dd.logContactFields("Database", this.currentContactID.value)
+    }
+
+    private fun refreshContactFields(){
+        this.currentContactFieldList = mutableStateListOf()
+        this.currentContactFieldList.clear()
+        this.dd.getContactFields(this.currentContactID.value).forEach {
+            this.currentContactFieldList.add(it)
+        }
+    }
+    private fun addContact(){
+        this.dd.addNewContact(
+            this.newContactFirstName,
+            this.newContactLastName,
+            this.newContactImage,
+            this.newContactRelation)
+        this.refreshContactList()
+        Log.d(TAG, "Added contact via database DAO.")
+    }
+
+    private fun refreshContactList(){
+        this.touchBaseContactList = mutableStateListOf()
+        this.touchBaseContactList.clear()
+        this.dd.getContactList().forEach {
+            this.touchBaseContactList.add(
+                it,
+            )
         }
     }
 
-    fun testing(){
-        Log.v(TAG, "Testing")
-        /** Adding Contact to database **/
-        Log.d(TAG, "Test: Adding person to database")
-//        val dd = DatabaseDriver(this.db)
-//        Log.d(TAG, "Clearing database before testing")
-//        dd.clearDatabases()
-//        if(dd.addNewContact("Ryan", "May", "", Relation.ImmediateFamily) &&
-//            dd.addNewContact("Chantelle", "Machado", "", Relation.ImmediateFamily)){
-//            Log.d(TAG,"Added new person to database")
-//        }
-//        if(!dd.addNewContact("Ryan", "May", "", Relation.ImmediateFamily)){
-//            Log.d(TAG,"Unique constraint to database was successful")
-//        }
-//        /** Listing contacts in database **/
-//        Log.d(TAG, "Test: Getting persons in database")
-//        dd.logContacts(TAG)
-//        /** Testing remove contact **/
-//        Log.d(TAG, "Test: Removing first person in database")
-//        val idOfFirstContact = dd.getContactList()[0].second
-//        dd.removeContact(idOfFirstContact)
-//        dd.logContacts(TAG)
-//        /** Adding field to database **/
-//        Log.d(TAG, "Test: adding a field to the database")
-//        val idOfSecondContact = dd.getContactList()[0].second
-//        val field = SimpleField(Titles.WorkPhone, "0479 105 458")
-//        dd.addNewContactField(idOfSecondContact, field)
-//        dd.logContactFields(TAG, idOfSecondContact)
+    private fun removeContact(){
+        this.dd.removeContact(this.currentContactID.value)
+        this.touchBaseContactList = mutableStateListOf()
+        this.dd.getContactList().forEach {
+            this.touchBaseContactList.add(
+                it,
+            )
+        }
+        Log.d(TAG, "Removed contact via database DAO.")
     }
 
-    private fun populateContactList(context: Context){
-        touchBaseContacts.add(TouchBaseDisplayModel(3452,"Charles", "Xavier", BitmapFactory.decodeResource(context.resources, R.drawable.xavier)))
-        touchBaseContacts.add(TouchBaseDisplayModel(9278,"Scott", "Summers", BitmapFactory.decodeResource(context.resources, R.drawable.scott)))
-        touchBaseContacts.add(TouchBaseDisplayModel(3452,"Henry", "Philip", BitmapFactory.decodeResource(context.resources, R.drawable.hank)))
-        touchBaseContacts.add(TouchBaseDisplayModel(3452,"Kurt", "Wagner", BitmapFactory.decodeResource(context.resources, R.drawable.kurt)))
-        touchBaseContacts.add(TouchBaseDisplayModel(3452,"James", "Logan", BitmapFactory.decodeResource(context.resources, R.drawable.logan)))
-        touchBaseContacts.add(TouchBaseDisplayModel(3452,"Ororo", "Munroe", BitmapFactory.decodeResource(context.resources, R.drawable.storm)))
-        touchBaseContacts.add(TouchBaseDisplayModel(3452,"Max", "Eisenhardt", BitmapFactory.decodeResource(context.resources, R.drawable.max)))
-        touchBaseContacts.add(TouchBaseDisplayModel(3452,"Anna Marie", "LeBeau", BitmapFactory.decodeResource(context.resources, R.drawable.anna)))
-        touchBaseContacts.add(TouchBaseDisplayModel(3452,"Remy Etienne", "LeBeau", BitmapFactory.decodeResource(context.resources, R.drawable.remy)))
-        touchBaseContacts.add(TouchBaseDisplayModel(3452,"Wade Winston", "Wilson", BitmapFactory.decodeResource(context.resources, R.drawable.wade)))
-    }
+
 }

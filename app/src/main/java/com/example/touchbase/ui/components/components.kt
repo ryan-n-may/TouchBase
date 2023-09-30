@@ -1,5 +1,6 @@
 package com.example.touchbase.ui.components
 
+import android.graphics.Bitmap
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -14,7 +15,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.BottomAppBar
-import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -27,14 +27,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.touchbase.Destination
-import com.example.touchbase.R
 import com.example.touchbase.models.TouchBaseDisplayModel
 import com.example.touchbase.viewmodel.TouchBaseEvent
 import com.example.touchbase.viewmodel.TouchBaseViewModel
@@ -49,11 +47,12 @@ fun ContactItem(
     Row (
         modifier = modifier
             .fillMaxWidth()
+            .padding(5.dp)
             .border(
                 width = 1.dp,
                 color = Color.LightGray
             )
-            .padding(5.dp)
+            .padding(10.dp)
             .clickable {
                 viewModel.onEvent(TouchBaseEvent.ProfileSelected(contact.id))
                 navController.navigate(Destination.ProfileScreen.route)
@@ -61,13 +60,8 @@ fun ContactItem(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ){
-        if(contact.profile == null)
-        {
-            RoundProfileImage(modifier = Modifier.height(100.dp))
-        }else
-        {
-            RoundProfileImage(image = contact.profile!!)
-        }
+        RoundProfileImage(image = contact.profile, modifier = Modifier.height(100.dp))
+
         Column (
             modifier = Modifier.fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
@@ -80,30 +74,11 @@ fun ContactItem(
 
 @Composable
 fun RoundProfileImage(
+    image: Bitmap,
     modifier: Modifier = Modifier
 ){
     Image(
-        painter = painterResource(R.drawable.default_pic),
-        contentDescription = null,
-        modifier = modifier
-            .aspectRatio(1f, matchHeightConstraintsFirst = true)
-            .border(
-                width = 2.dp,
-                color = MaterialTheme.colorScheme.secondary,
-                shape = CircleShape
-            )
-            .padding(3.dp)
-            .clip(CircleShape)
-    )
-}
-
-@Composable
-fun RoundProfileImage(
-    image: ImageBitmap,
-    modifier: Modifier = Modifier
-){
-    Image(
-        bitmap = image,
+        bitmap = image.asImageBitmap(),
         contentDescription = null,
         modifier = modifier
             .aspectRatio(1f, matchHeightConstraintsFirst = true)
@@ -131,7 +106,7 @@ fun TitleBar() {
 }
 
 @Composable
-fun AddButton(navController: NavHostController, viewmodel: TouchBaseViewModel) {
+fun AddButton(viewmodel: TouchBaseViewModel) {
     FloatingActionButton(onClick = { viewmodel.onEvent(TouchBaseEvent.AddContact) }) {
         Icon(imageVector = Icons.Default.Add, contentDescription = "add")
     }
@@ -178,7 +153,7 @@ fun BottomProfileBar(navController: NavHostController, viewmodel: TouchBaseViewM
 }
 
 @Composable
-fun profileField(label: String, content: () -> String, onValueChange: (String) -> Unit){
+fun ProfileField(label: String, content: () -> String, onValueChange: (String) -> Unit){
     Row (
         modifier = Modifier
             .fillMaxWidth()
@@ -191,13 +166,13 @@ fun profileField(label: String, content: () -> String, onValueChange: (String) -
     }
 }
 
-@Composable
-fun Testing(viewModel : TouchBaseViewModel) {
-    Button(
-        onClick = {
-//            viewModel.testing()
-        }
-    ) {
-        Text("Test")
-    }
-}
+//@Composable
+//fun Testing(viewModel : TouchBaseViewModel) {
+//    Button(
+//        onClick = {
+////            viewModel.testing()
+//        }
+//    ) {
+//        Text("Test")
+//    }
+//}

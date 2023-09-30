@@ -1,15 +1,17 @@
 package com.example.touchbase.viewmodel
 
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.lifecycle.ViewModel
 import androidx.room.Room
+import com.example.touchbase.R
 import com.example.touchbase.backend.CONTACT_DATABASE
 import com.example.touchbase.models.TouchBaseDisplayModel
 
@@ -22,16 +24,16 @@ class TouchBaseViewModel(context: Context) : ViewModel() {
 
     // Display Values
     var id by mutableIntStateOf(6595)
-    var profile: ImageBitmap? by mutableStateOf(null)
+    var profile: Bitmap by mutableStateOf(BitmapFactory.decodeResource(context.resources, R.drawable.xavier))
     var relation by mutableStateOf("Brother")
     var firstName by mutableStateOf("Test")
-    var lastName by mutableStateOf("McTesterson")
+    var lastName by mutableStateOf("McTest")
     var phoneNumber by mutableStateOf("95968751")
     var email by mutableStateOf("TestEmail@Curtin.edu.au")
 
     init {
         Log.v(TAG,"TouchBase Viewmodel Loaded")
-        populateContactList()
+        populateContactList(context)
         // Makes Database
         db = Room.databaseBuilder(
             context,
@@ -55,7 +57,7 @@ class TouchBaseViewModel(context: Context) : ViewModel() {
         /** Adding Contact to database **/
         Log.d(TAG, "Test: Adding person to database")
 //        val dd = DatabaseDriver(this.db)
-//        Log.d(TAG, "Clearning database before testing")
+//        Log.d(TAG, "Clearing database before testing")
 //        dd.clearDatabases()
 //        if(dd.addNewContact("Ryan", "May", "", Relation.ImmediateFamily) &&
 //            dd.addNewContact("Chantelle", "Machado", "", Relation.ImmediateFamily)){
@@ -80,15 +82,16 @@ class TouchBaseViewModel(context: Context) : ViewModel() {
 //        dd.logContactFields(TAG, idOfSecondContact)
     }
 
-    private fun populateContactList(){
-        touchBaseContacts.add(TouchBaseDisplayModel(3452,"John", "Doe", null))
-        touchBaseContacts.add(TouchBaseDisplayModel(7343,"Ryan", "May", null))
-        touchBaseContacts.add(TouchBaseDisplayModel(7654,"Keven", "Rashleigh", null))
-        touchBaseContacts.add(TouchBaseDisplayModel(1298,"Sajib", "Mistry", null))
-        touchBaseContacts.add(TouchBaseDisplayModel(6658,"Bruce", "Wayne", null))
-        touchBaseContacts.add(TouchBaseDisplayModel(2853,"Peter", "Parker", null))
-        touchBaseContacts.add(TouchBaseDisplayModel(9723,"Ash", "Katchum", null))
-        touchBaseContacts.add(TouchBaseDisplayModel(2387,"Sonic", "Hedgehog", null))
-        touchBaseContacts.add(TouchBaseDisplayModel(4578,"Luigi", "Mario", null))
+    private fun populateContactList(context: Context){
+        touchBaseContacts.add(TouchBaseDisplayModel(3452,"Charles", "Xavier", BitmapFactory.decodeResource(context.resources, R.drawable.xavier)))
+        touchBaseContacts.add(TouchBaseDisplayModel(9278,"Scott", "Summers", BitmapFactory.decodeResource(context.resources, R.drawable.scott)))
+        touchBaseContacts.add(TouchBaseDisplayModel(3452,"Henry", "Philip", BitmapFactory.decodeResource(context.resources, R.drawable.hank)))
+        touchBaseContacts.add(TouchBaseDisplayModel(3452,"Kurt", "Wagner", BitmapFactory.decodeResource(context.resources, R.drawable.kurt)))
+        touchBaseContacts.add(TouchBaseDisplayModel(3452,"James", "Logan", BitmapFactory.decodeResource(context.resources, R.drawable.logan)))
+        touchBaseContacts.add(TouchBaseDisplayModel(3452,"Ororo", "Munroe", BitmapFactory.decodeResource(context.resources, R.drawable.storm)))
+        touchBaseContacts.add(TouchBaseDisplayModel(3452,"Max", "Eisenhardt", BitmapFactory.decodeResource(context.resources, R.drawable.max)))
+        touchBaseContacts.add(TouchBaseDisplayModel(3452,"Anna Marie", "LeBeau", BitmapFactory.decodeResource(context.resources, R.drawable.anna)))
+        touchBaseContacts.add(TouchBaseDisplayModel(3452,"Remy Etienne", "LeBeau", BitmapFactory.decodeResource(context.resources, R.drawable.remy)))
+        touchBaseContacts.add(TouchBaseDisplayModel(3452,"Wade Winston", "Wilson", BitmapFactory.decodeResource(context.resources, R.drawable.wade)))
     }
 }

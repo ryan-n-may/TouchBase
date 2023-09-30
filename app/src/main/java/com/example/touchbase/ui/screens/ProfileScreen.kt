@@ -16,9 +16,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.touchbase.ui.components.BottomProfileBar
+import com.example.touchbase.ui.components.ProfileField
 import com.example.touchbase.ui.components.RoundProfileImage
 import com.example.touchbase.ui.components.TitleBar
-import com.example.touchbase.ui.components.profileField
 import com.example.touchbase.viewmodel.TouchBaseEvent
 import com.example.touchbase.viewmodel.TouchBaseViewModel
 
@@ -35,13 +35,7 @@ fun ProfileScreen(navController: NavHostController, viewmodel: TouchBaseViewMode
                 .fillMaxSize()
                 .padding(innerPadding)
         ){
-            if(viewmodel.profile == null)
-            {
-                RoundProfileImage(modifier = Modifier.height(200.dp))
-            }else
-            {
-                RoundProfileImage(image = viewmodel.profile!!)
-            }
+            RoundProfileImage(image = viewmodel.profile)
             
             Text(text = viewmodel.id.toString())
 
@@ -58,11 +52,11 @@ fun ProfileScreen(navController: NavHostController, viewmodel: TouchBaseViewMode
             LazyColumn(modifier = Modifier
                 .fillMaxSize()
                 .padding(3.dp)){
-                item { profileField(label = "Relation: ", content = {viewmodel.relation}, onValueChange = {viewmodel.relation = it} )}
-                item { profileField(label = "First Name: ", content = {viewmodel.firstName}, onValueChange = {viewmodel.firstName = it} )}
-                item { profileField(label = "Last Name: ", content = {viewmodel.lastName}, onValueChange = {viewmodel.lastName = it} )}
-                item { profileField(label = "Phone Number: ", content = {viewmodel.phoneNumber}, onValueChange = {viewmodel.phoneNumber = it} )}
-                item { profileField(label = "Email: ", content = {viewmodel.email}, onValueChange = {viewmodel.email = it} )}
+                item { ProfileField(label = "Relation: ", content = {viewmodel.relation}, onValueChange = {viewmodel.relation = it} )}
+                item { ProfileField(label = "First Name: ", content = {viewmodel.firstName}, onValueChange = {viewmodel.firstName = it} )}
+                item { ProfileField(label = "Last Name: ", content = {viewmodel.lastName}, onValueChange = {viewmodel.lastName = it} )}
+                item { ProfileField(label = "Phone Number: ", content = {viewmodel.phoneNumber}, onValueChange = {viewmodel.phoneNumber = it} )}
+                item { ProfileField(label = "Email: ", content = {viewmodel.email}, onValueChange = {viewmodel.email = it} )}
             }
         }
     }

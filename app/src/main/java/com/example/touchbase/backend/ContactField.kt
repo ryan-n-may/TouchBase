@@ -4,9 +4,6 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
-typealias URL           = String
-typealias PhoneNumber   = String
-typealias Email         = String
 enum class Titles {
     NA,
     /** Regular Contacts **/

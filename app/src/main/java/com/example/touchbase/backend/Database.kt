@@ -1,7 +1,13 @@
 package com.example.touchbase.backend
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.media.Image
 import android.util.Log
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.room.*
+import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
 
 class Converters {
     @TypeConverter
@@ -16,6 +22,24 @@ class Converters {
         Log.d(TAG, "Serializing simple field.")
         return field.serialize()
     }
+
+    @TypeConverter
+    fun fromImage(image : Bitmap) : String {
+        Log.d(TAG, "Serializing image.")
+        val stream = ByteArrayOutputStream();
+        image.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+        val byteArr = stream.toByteArray();
+        val string = byteArr.toString(Charsets.ISO_8859_1)
+        return string
+    }
+
+    @TypeConverter
+    fun toImage(string : String) : Bitmap? {
+        Log.d(TAG, "Deserializing image.")
+        val byteArray = string.toByteArray(Charsets.ISO_8859_1)
+        val image = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size);
+        return image
+    }
 }
 
 const val CONTACT_LIST = "CONTACT_LIST_TABLE"
@@ -23,11 +47,11 @@ const val FIELD_LIST = "FIELD_LIST_TABLE"
 
 @Entity(tableName = CONTACT_LIST)
 class CONTACT_TABLE(
-    @PrimaryKey val id : Int,
-    val firstName : String,
-    val lastName : String,
-    val image : String,
-    val relation : String
+    @PrimaryKey val id  : Int,
+    val firstName       : String,
+    val lastName        : String,
+    val image           : Bitmap,
+    val relation        : String
 )
 
 @Entity(tableName = FIELD_LIST)
@@ -56,7 +80,7 @@ interface CONTACT_DAO {
         contactID   : Int?,
         firstName   : String,
         lastName    : String,
-        image       : String,
+        image       : Bitmap,
         relation    : String,
     )
     @Query("DELETE FROM $CONTACT_LIST WHERE id == :id")
@@ -71,6 +95,12 @@ interface CONTACT_DAO {
     @Query("INSERT INTO $FIELD_LIST (id, field) " +
             "VALUES (:id, :field)")
     fun addNewField(
+        id      : Int,
+        field   : SimpleField
+    )
+
+    @Query("DELETE FROM $FIELD_LIST WHERE id == :id AND field == :field")
+    fun removeContactField(
         id      : Int,
         field   : SimpleField
     )
@@ -95,7 +125,10 @@ interface CONTACT_DAO {
     @Query("SELECT lastName from $CONTACT_LIST WHERE id == :id")
     fun fetchLastName(id : Int) : String
     @Query("SELECT image from $CONTACT_LIST WHERE id == :id")
-    fun fetchImage(id : Int) : String
+    fun fetchImage(id : Int) : Bitmap
+    /** Accessors that fetch all the contact cards for a given ID **/
+    @Query("SELECT relation from $CONTACT_LIST WHERE id == :id")
+    fun fetchRelation(id : Int) : String
     /** Accessors that fetch all the contact cards for a given ID **/
     @Query("SELECT field from $FIELD_LIST WHERE id == :id")
     fun fetchAllFields(id : Int) : List<SimpleField>

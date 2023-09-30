@@ -1,6 +1,7 @@
 package com.example.touchbase.backend
 
 import android.database.sqlite.SQLiteConstraintException
+import android.graphics.Bitmap
 import android.util.Log
 import kotlin.random.Random
 
@@ -10,7 +11,8 @@ data class Contact(
     var id  : Int,
     var firstName : String,
     var lastName : String,
-    var image : String
+    var image : Bitmap?,
+    var relation : Relation
 )
 
 class DatabaseDriver(db : CONTACT_DATABASE) {
@@ -48,6 +50,9 @@ class DatabaseDriver(db : CONTACT_DATABASE) {
     fun getContactFields(id : Int) : List<SimpleField> {
         return this.dao.fetchAllFields(id)
     }
+    fun deleteContactField(id : Int, field: SimpleField) {
+        this.dao.removeContactField(id, field)
+    }
 
     /**
      * DELETE DATABASE
@@ -64,16 +69,18 @@ class DatabaseDriver(db : CONTACT_DATABASE) {
     fun getContactList() : MutableList<Contact>{
         val listIDs = this.dao.getAllContacts_OrderByFirstNameDesc()
         var listContacts : MutableList<Contact> = mutableListOf()
-        var firstName   : String
-        var lastName    : String
-        var image       : String
-        var id          : Int
+        var firstName       : String
+        var lastName        : String
+        var image           : Bitmap
+        var id              : Int
+        var relation    : Relation
         for(i in listIDs.indices){
             id          = listIDs[i]
             firstName   = this.dao.fetchFirstName(id)
             lastName    = this.dao.fetchLastName(id)
             image       = this.dao.fetchImage(id)
-            var newContract = Contact(id, firstName, lastName, image)
+            relation    = Relation.valueOf(this.dao.fetchRelation(id))
+            var newContract = Contact(id, firstName, lastName, image, relation)
             /** Create contact obj here **/
             /** Add contact obj to list instead of tripple **/
             listContacts.add(newContract)
@@ -97,7 +104,7 @@ class DatabaseDriver(db : CONTACT_DATABASE) {
     fun addNewContact(
         firstName   : String,
         lastName    : String,
-        image       : String = "",
+        image       : Bitmap,
         relation    : Relation,
     ) : Boolean {
         Log.v(TAG, "Adding new contact $firstName $lastName")

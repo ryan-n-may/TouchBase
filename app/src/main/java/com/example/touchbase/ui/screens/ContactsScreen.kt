@@ -7,7 +7,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
-import com.example.touchbase.ui.components.AddButton
+import com.example.touchbase.ui.components.AddContactButton
 import com.example.touchbase.ui.components.ContactItem
 import com.example.touchbase.ui.components.TitleBar
 import com.example.touchbase.viewmodel.TouchBaseViewModel
@@ -16,12 +16,12 @@ import com.example.touchbase.viewmodel.TouchBaseViewModel
 fun ContactsScreen(navController: NavHostController, viewmodel: TouchBaseViewModel) {
     Scaffold(
         topBar = {TitleBar()},
-        floatingActionButton = { AddButton(viewmodel = viewmodel)}
+        floatingActionButton = { AddContactButton(navController = navController)}
     ) { innerPadding ->
         LazyColumn(
             modifier = Modifier.padding(innerPadding)
         ){
-            items(viewmodel.touchBaseContacts) { item ->
+            items(viewmodel.touchBaseContactList) { item ->
                 ContactItem(viewmodel, navController, item)
             }
         }

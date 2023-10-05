@@ -74,10 +74,6 @@ fun ContactItem(
             modifier = modifier
                 .fillMaxWidth()
                 .padding(5.dp)
-                .border(
-                    width = 1.dp,
-                    color = Color.LightGray,
-                )
                 .padding(10.dp)
                 .clickable {
                     viewModel.onEvent(TouchBaseEvent.ProfileSelected(contact.id))
@@ -156,11 +152,6 @@ fun RoundProfileImage(
                     contentDescription = null,
                     modifier = modifier
                         .aspectRatio(1f, matchHeightConstraintsFirst = true)
-                        .border(
-                            width = 1.dp,
-                            color = Color.LightGray,
-                            shape = CircleShape
-                        )
                         .padding(2.dp)
                         .clip(CircleShape)
                 )

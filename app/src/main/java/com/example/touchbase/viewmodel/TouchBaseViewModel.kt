@@ -110,6 +110,16 @@ class TouchBaseViewModel(context: Context) : ViewModel() {
                 this.updatePicture()
                 this.refreshContactList()
             }
+            TouchBaseEvent.EditContact -> {
+                Log.v(TAG, "Editing contact")
+                this.editContact()
+                this.refreshContactList()
+            }
+            TouchBaseEvent.EditField -> {
+                Log.v(TAG, "Editing Field")
+                this.editContactField()
+                this.refreshContactFields()
+            }
             is TouchBaseEvent.ProfileSelected -> {
                 Log.v(TAG,"Profile Selected -> Id=${event.id}")
                 this.currentContactID.value = event.id
@@ -181,6 +191,26 @@ class TouchBaseViewModel(context: Context) : ViewModel() {
             )
         }
         Log.d(TAG, "Removed contact via database DAO.")
+    }
+
+    private fun editContact(){
+        Log.d(TAG, "editContact() called.")
+        this.dd.updateContactName(
+            this.currentContactID.value,
+            this.currentContactFirstName.value,
+            this.currentContactLastName.value
+            )
+        this.dd.updateContactImage(
+            this.currentContactID.value,
+            this.currentContactImage.value
+        )
+    }
+
+    private fun editContactField(){
+        Log.d(TAG, "editContactField() called.")
+        val fieldID = this.dd.getContactFieldID(this.currentContactID.value, this.currentContactField.value)
+        val newField = SimpleField(this.currentFieldTitle.value, this.currentFieldContents.value)
+        this.dd.editContactField(fieldID, newField)
     }
 
     fun handleImageCapture(bitmap: Bitmap){

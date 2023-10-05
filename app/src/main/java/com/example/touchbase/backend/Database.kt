@@ -136,6 +136,8 @@ interface CONTACT_DAO {
     /** Accessors that fetch all the contact cards for a given ID **/
     @Query("SELECT field from $FIELD_LIST WHERE id == :id")
     fun fetchAllFields(id : Int) : List<SimpleField>
+    @Query("SELECT fieldID from $FIELD_LIST WHERE id == :id AND field == :field")
+    fun fetchSpecificFieldID(id : Int, field : SimpleField) : Int
     /**
      * MUTATORS
      */
@@ -149,6 +151,6 @@ interface CONTACT_DAO {
     @Query("UPDATE $CONTACT_LIST SET firstName = :firstName WHERE id == :id")
     fun updateContactFirstName(id : Int, firstName : String)
     /** Update Contact Last Name **/
-    @Query("UPDATE $CONTACT_LIST SET firstName = :firstName WHERE id == :id")
-    fun updateContactLastName(id : Int, firstName : String)
+    @Query("UPDATE $CONTACT_LIST SET lastName = :lastName WHERE id == :id")
+    fun updateContactLastName(id : Int, lastName : String)
 }

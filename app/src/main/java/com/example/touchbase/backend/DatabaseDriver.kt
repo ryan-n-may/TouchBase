@@ -151,4 +151,8 @@ class DatabaseDriver(db : CONTACT_DATABASE) {
     fun editContactField(fieldID : Int, simpleField : SimpleField){
         this.dao.updateContactField(fieldID, simpleField)
     }
+
+    fun getContactFieldID(id : Int, field : SimpleField) : Int{
+        return this.dao.fetchSpecificFieldID(id, field)
+    }
 }

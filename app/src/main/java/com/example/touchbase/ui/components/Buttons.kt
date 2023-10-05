@@ -86,11 +86,10 @@ fun DeleteFieldButton(navController : NavHostController, viewModel : TouchBaseVi
 fun EditFieldButton(navController : NavHostController, viewModel : TouchBaseViewModel, it : SimpleField){
     IconButton(
         onClick = {
-            //navController.navigate(Destination.ProfileScreen.route)
             viewModel.currentContactField.value = it
             viewModel.currentFieldTitle.value = it.Title
             viewModel.currentFieldContents.value = it.Content
-            //viewModel.onEvent(TouchBaseEvent.DeleteContactField)
+            navController.navigate(Destination.EditFieldScreen.route)
         },
         modifier = Modifier.padding(0.dp)
     ) {
@@ -139,7 +138,7 @@ fun EditContactButton(
     IconButton(
         onClick = {
             viewModel.currentContactID.value = id
-            navController.navigate(Destination.CameraScreen.route)
+            navController.navigate(Destination.EditContactScreen.route)
         }) {
         Icon(imageVector = Icons.TwoTone.Edit, contentDescription = "Edit Contact")
     }

@@ -180,10 +180,10 @@ fun RoundProfileImage(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TitleBar() {
+fun TitleBar(title : String) {
     CenterAlignedTopAppBar(title = {
         Text(
-            text = "TouchBase",
+            text = "$title",
             fontSize = 30.sp,
             color = MaterialTheme.colorScheme.primary,
             fontStyle = MaterialTheme.typography.headlineLarge.fontStyle,

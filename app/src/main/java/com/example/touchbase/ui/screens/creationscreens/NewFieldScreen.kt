@@ -17,7 +17,7 @@ import com.example.touchbase.viewmodel.TouchBaseViewModel
 @Composable
 fun NewFieldScreen(navController: NavHostController, viewmodel: TouchBaseViewModel) {
     Scaffold(
-        topBar = { TitleBar() },
+        topBar = { TitleBar("New Title") },
         floatingActionButton = {
             Row{
                 BackButton(navController = navController)

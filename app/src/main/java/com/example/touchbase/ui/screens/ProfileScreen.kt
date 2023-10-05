@@ -17,7 +17,7 @@ import com.example.touchbase.viewmodel.TouchBaseViewModel
 @Composable
 fun ProfileScreen(navController: NavHostController, viewmodel: TouchBaseViewModel) {
     Scaffold(
-        topBar = { TitleBar() },
+        topBar = { TitleBar("Profile") },
         bottomBar = { BottomProfileBar(navController = navController, viewmodel = viewmodel)}
     ) { innerPadding ->
         Column(

@@ -16,7 +16,7 @@ import com.example.touchbase.viewmodel.TouchBaseViewModel
 @Composable
 fun EditFieldScreen(navController: NavHostController, viewmodel: TouchBaseViewModel) {
         Scaffold(
-                topBar = { TitleBar() },
+                topBar = { TitleBar("Edit Field") },
                 floatingActionButton = {
                         Row{
                                 BackButton(navController = navController)
@@ -37,7 +37,7 @@ fun EditFieldScreen(navController: NavHostController, viewmodel: TouchBaseViewMo
                                 viewmodel,
                                 viewmodel.currentFieldTitle
                         )
-                        SimpleInput("Content: ", content = {viewmodel.newFieldContents.value}, onValueChange = {viewmodel.newFieldContents.value = it})
+                        SimpleInput("Content: ", content = {viewmodel.currentFieldContents.value}, onValueChange = {viewmodel.currentFieldContents.value = it})
                 }
         }
 }

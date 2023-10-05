@@ -49,7 +49,7 @@ fun RelationshipEnumSelector(options : Array<Relation>,
                 }) {
                 Icon(imageVector = Icons.Default.KeyboardArrowDown, contentDescription = "Enum Selector")
             }
-            Text(viewModel.newContactRelation.toString(), fontSize = 20.sp, fontWeight = FontWeight.Bold)
+            Text(viewModel.newContactRelation.value.toString(), fontSize = 20.sp, fontWeight = FontWeight.Bold)
         }
         DropdownMenu(
             expanded = expanded,
@@ -94,7 +94,7 @@ fun TitleEnumSelector(options : Array<Titles>,
                 }) {
                 Icon(imageVector = Icons.Default.KeyboardArrowDown, contentDescription = "Enum Selector")
             }
-            Text(viewModel.newFieldTitle.toString(), fontSize = 20.sp, fontWeight = FontWeight.Bold)
+            Text(viewModel.newFieldTitle.value.toString(), fontSize = 20.sp, fontWeight = FontWeight.Bold)
         }
         DropdownMenu(
             expanded = expanded,

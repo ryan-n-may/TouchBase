@@ -72,7 +72,9 @@ interface CONTACT_DAO {
     fun clearContactList()
     @Query("DELETE FROM $FIELD_LIST")
     fun clearFieldList()
-    /** Mutators **/
+    /**
+     * Mutators: ADD AND REMOVE
+     */
     // Insert new contact into database
     @Query("INSERT INTO $CONTACT_LIST (id, firstName, lastName, image, relation) " +
             "VALUES (:contactID, :firstName, :lastName, :image, :relation)")
@@ -104,7 +106,9 @@ interface CONTACT_DAO {
         id      : Int,
         field   : SimpleField
     )
-    /** Accessors **/
+    /**
+     * Accessors
+     */
     /** Accessors that get all the users with a broad filter, or sorting **/
     @Query("SELECT id FROM $CONTACT_LIST ORDER BY firstName DESC")
     fun getAllContacts_OrderByFirstNameDesc() : List<Int>
@@ -132,4 +136,19 @@ interface CONTACT_DAO {
     /** Accessors that fetch all the contact cards for a given ID **/
     @Query("SELECT field from $FIELD_LIST WHERE id == :id")
     fun fetchAllFields(id : Int) : List<SimpleField>
+    /**
+     * MUTATORS
+     */
+    /** Update contact image **/
+    @Query("UPDATE $CONTACT_LIST SET image = :bitmap WHERE id == :id")
+    fun updateContactImage(id : Int, bitmap : Bitmap)
+    /** Update contact field **/
+    @Query("UPDATE $FIELD_LIST SET field = :simpleField WHERE fieldID == :fieldID")
+    fun updateContactField(fieldID : Int, simpleField : SimpleField)
+    /** Update Contact First Name **/
+    @Query("UPDATE $CONTACT_LIST SET firstName = :firstName WHERE id == :id")
+    fun updateContactFirstName(id : Int, firstName : String)
+    /** Update Contact Last Name **/
+    @Query("UPDATE $CONTACT_LIST SET firstName = :firstName WHERE id == :id")
+    fun updateContactLastName(id : Int, firstName : String)
 }

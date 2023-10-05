@@ -1,13 +1,9 @@
-package com.example.touchbase.ui.screens
+package com.example.touchbase.ui.screens.editscreens
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
@@ -16,18 +12,17 @@ import com.example.touchbase.ui.components.*
 import com.example.touchbase.viewmodel.TouchBaseEvent
 import com.example.touchbase.viewmodel.TouchBaseViewModel
 
-@OptIn(ExperimentalStdlibApi::class)
 @Composable
-fun NewContactsScreen(navController: NavHostController, viewmodel: TouchBaseViewModel) {
+fun EditContactScreen(navController: NavHostController, viewmodel: TouchBaseViewModel) {
     Scaffold(
         topBar = { TitleBar() },
-        floatingActionButton = { 
-            Row{ 
+        floatingActionButton = {
+            Row{
                 BackButton(navController = navController)
                 ConfirmButton(
                     navController = navController,
                     viewModel = viewmodel,
-                    event = TouchBaseEvent.AddContact
+                    event = TouchBaseEvent.EditContact
                 )
             }
         }
@@ -35,13 +30,18 @@ fun NewContactsScreen(navController: NavHostController, viewmodel: TouchBaseView
         Column(
             modifier = Modifier.padding(innerPadding)
         ){
-            AddPhoto()
-            SimpleInput("First Name: ", content = {viewmodel.newContactFirstName}, onValueChange = {viewmodel.newContactFirstName = it})
-            SimpleInput("Last Name: ", content = {viewmodel.newContactLastName}, onValueChange = {viewmodel.newContactLastName = it})
+            AddPhoto(
+                viewModel = viewmodel,
+                navController = navController,
+                id = viewmodel.currentContactID.value
+            )
+            SimpleInput("First Name: ", content = {viewmodel.currentContactFirstName.value}, onValueChange = {viewmodel.currentContactFirstName.value = it})
+            SimpleInput("Last Name: ", content = {viewmodel.currentContactLastName.value}, onValueChange = {viewmodel.currentContactLastName.value = it})
             RelationshipEnumSelector(
                 Relation.values(),
                 "Relationship:",
-                viewmodel
+                viewmodel,
+                viewmodel.newContactRelation
             )
         }
     }

@@ -6,7 +6,8 @@ sealed class TouchBaseEvent{
     object AddContactField: TouchBaseEvent()
     object DeleteContactField: TouchBaseEvent()
     object DeleteContact: TouchBaseEvent()
-    object CameraOpen: TouchBaseEvent()
-    object CameraTakePic: TouchBaseEvent()
+    object AddPhoto : TouchBaseEvent()
+    object EditContact : TouchBaseEvent()
+    object EditField : TouchBaseEvent()
     data class ProfileSelected(val id: Int): TouchBaseEvent()
 }

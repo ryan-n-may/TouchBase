@@ -13,14 +13,18 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.CreationExtras
+import android.Manifest
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.touchbase.ui.screens.ContactsScreen
-import com.example.touchbase.ui.screens.NewContactsScreen
+import com.example.touchbase.ui.screens.creationscreens.NewContactsScreen
 import com.example.touchbase.ui.screens.ProfileScreen
-import com.example.touchbase.ui.screens.NewFieldScreen
+import com.example.touchbase.ui.screens.creationscreens.NewFieldScreen
+import com.example.touchbase.ui.screens.NewCameraScreen
+import com.example.touchbase.ui.screens.editscreens.EditContactScreen
+import com.example.touchbase.ui.screens.editscreens.EditFieldScreen
 import com.example.touchbase.ui.theme.TouchBaseTheme
 import com.example.touchbase.viewmodel.TouchBaseViewModel
 
@@ -30,10 +34,14 @@ sealed class Destination(val route: String){
     object ContactsScreen: Destination("Contacts")
     object ProfileScreen: Destination("Profile")
     object NewContactScreen: Destination("NewContact")
+    object EditContactScreen: Destination("EditContact")
     object AddFieldScreen: Destination("NewField")
+    object EditFieldScreen: Destination("EditField")
+    object CameraScreen: Destination("CameraScreen")
 }
 
 class MainActivity : ComponentActivity() {
+
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { isGranted ->
@@ -67,6 +75,27 @@ class MainActivity : ComponentActivity() {
                 NavigationAppHost(navController, viewModel)
             }
         }
+
+        requestCameraPermission()
+    }
+
+    private fun requestCameraPermission(){
+        when{
+            ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED -> {
+                Log.d(TAG, "Permission to camera already granted.");
+            }
+
+            ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.CAMERA) == true -> {
+                Log.d(TAG, "Show camera permissions dialog");
+            }
+
+            else -> requestPermissionLauncher.launch(Manifest.permission.CAMERA)
+        }
+    }
+
+    override fun onDestroy(){
+        super.onDestroy()
+        this.viewModel.cameraExecute.shutdown()
     }
 }
 
@@ -76,10 +105,13 @@ fun NavigationAppHost (navController: NavHostController, viewModel: TouchBaseVie
         navController = navController,
         startDestination = Destination.ContactsScreen.route
     ){
-        composable(route = Destination.ContactsScreen.route)    { ContactsScreen(navController,viewModel) }
-        composable(route = Destination.NewContactScreen.route)  { NewContactsScreen(navController,viewModel) }
-        composable(route = Destination.ProfileScreen.route)     { ProfileScreen(navController,viewModel) }
-        composable(route = Destination.AddFieldScreen.route)    { NewFieldScreen(navController, viewModel) }
+        composable(route = Destination.ContactsScreen.route)    { ContactsScreen(navController,viewModel)       }
+        composable(route = Destination.NewContactScreen.route)  { NewContactsScreen(navController,viewModel)    }
+        composable(route = Destination.ProfileScreen.route)     { ProfileScreen(navController,viewModel)        }
+        composable(route = Destination.AddFieldScreen.route)    { NewFieldScreen(navController, viewModel)      }
+        composable(route = Destination.CameraScreen.route)      { NewCameraScreen(navController, viewModel)     }
+        composable(route = Destination.EditContactScreen.route) { EditContactScreen(navController, viewModel)   }
+        composable(route = Destination.EditFieldScreen.route)   { EditFieldScreen(navController, viewModel)     }
     }
 }
 

@@ -15,7 +15,7 @@ import com.example.touchbase.viewmodel.TouchBaseViewModel
 @Composable
 fun ContactsScreen(navController: NavHostController, viewmodel: TouchBaseViewModel) {
     Scaffold(
-        topBar = {TitleBar()},
+        topBar = {TitleBar("TouchBase")},
         floatingActionButton = { AddContactButton(navController = navController)}
     ) { innerPadding ->
         LazyColumn(

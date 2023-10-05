@@ -5,7 +5,7 @@ import android.graphics.Bitmap
 import android.util.Log
 import kotlin.random.Random
 
-val TAG = "DatabaseDriver"
+const val TAG = "DatabaseDriver"
 
 data class Contact(
     var id  : Int,
@@ -88,6 +88,13 @@ class DatabaseDriver(db : CONTACT_DATABASE) {
         return listContacts
     }
 
+    fun getContactDetails(id : Int) : Triple<Bitmap, String, String> {
+        var firstName   = this.dao.fetchFirstName(id)
+        var lastName    = this.dao.fetchLastName(id)
+        var image       = this.dao.fetchImage(id)
+        return Triple(image, firstName, lastName)
+    }
+
     /**
      * Add a new contact field
      */
@@ -129,5 +136,23 @@ class DatabaseDriver(db : CONTACT_DATABASE) {
     fun removeContact(id : Int){
         this.dao.removeContact(id)
         this.dao.removeContactFields(id)
+    }
+
+    /**
+     * Update Items
+     */
+    fun updateContactImage(id : Int, bitmap : Bitmap){
+        this.dao.updateContactImage(id, bitmap)
+    }
+    fun updateContactName(id : Int, firstName : String, lastName : String){
+        this.dao.updateContactFirstName(id, firstName)
+        this.dao.updateContactLastName(id, lastName)
+    }
+    fun editContactField(fieldID : Int, simpleField : SimpleField){
+        this.dao.updateContactField(fieldID, simpleField)
+    }
+
+    fun getContactFieldID(id : Int, field : SimpleField) : Int{
+        return this.dao.fetchSpecificFieldID(id, field)
     }
 }

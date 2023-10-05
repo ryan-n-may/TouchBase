@@ -1,13 +1,10 @@
-package com.example.touchbase.ui.screens
+package com.example.touchbase.ui.screens.creationscreens
 
-import androidx.compose.foundation.layout.Box
+
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
@@ -20,7 +17,7 @@ import com.example.touchbase.viewmodel.TouchBaseViewModel
 @Composable
 fun NewFieldScreen(navController: NavHostController, viewmodel: TouchBaseViewModel) {
     Scaffold(
-        topBar = { TitleBar() },
+        topBar = { TitleBar("New Title") },
         floatingActionButton = {
             Row{
                 BackButton(navController = navController)
@@ -38,9 +35,10 @@ fun NewFieldScreen(navController: NavHostController, viewmodel: TouchBaseViewMod
             TitleEnumSelector(
                 Titles.values(),
                 "Field Type:",
-                viewmodel
+                viewmodel,
+                viewmodel.newFieldTitle
             )
-            SimpleInput("Content: ", content = {viewmodel.newFieldContents}, onValueChange = {viewmodel.newFieldContents = it})
+            SimpleInput("Content: ", content = {viewmodel.newFieldContents.value}, onValueChange = {viewmodel.newFieldContents.value = it})
         }
     }
 }

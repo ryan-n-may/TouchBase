@@ -16,7 +16,7 @@ import com.example.touchbase.viewmodel.TouchBaseViewModel
 @Composable
 fun EditFieldScreen(navController: NavHostController, viewmodel: TouchBaseViewModel) {
         Scaffold(
-                topBar = { TitleBar("Edit Field") },
+                topBar = { TitleBar("EDIT FIELD") },
                 floatingActionButton = {
                         Row{
                                 BackButton(navController = navController)

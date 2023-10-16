@@ -113,7 +113,7 @@ class DatabaseDriver(db : CONTACT_DATABASE) {
         lastName    : String,
         image       : Bitmap,
         relation    : Relation,
-    ) : Boolean {
+    ) : Int? {
         Log.v(TAG, "Adding new contact $firstName $lastName")
         val arr = firstName.chars().toArray()
         var seed = 0
@@ -125,9 +125,9 @@ class DatabaseDriver(db : CONTACT_DATABASE) {
         try{
             this.dao.addNewContact(id, firstName, lastName, image, relation.toString())
         } catch (e : SQLiteConstraintException){
-            return false
+            return null
         }
-        return true
+        return id
     }
 
     /**

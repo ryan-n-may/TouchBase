@@ -2,6 +2,7 @@ package com.example.touchbase.ui.components
 
 import android.graphics.Bitmap
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -37,6 +38,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.text.font.FontWeight
@@ -58,7 +60,9 @@ fun ContactTitle(
     Row(
         verticalAlignment = Alignment.CenterVertically
     ){
-        Text(text = "${viewmodel.currentContactFirstName.value} ${viewmodel.currentContactLastName.value}", fontSize = 25.sp, fontWeight = FontWeight.Medium)
+        Text(text = "${viewmodel.currentContactFirstName.value} ${viewmodel.currentContactLastName.value}",
+            fontSize = 25.sp,
+            fontWeight = FontWeight.Normal)
         EditContactButton(viewmodel, navController, viewmodel.currentContactID.value)
     }
 }
@@ -73,7 +77,6 @@ fun ContactItem(
         Row (
             modifier = modifier
                 .fillMaxWidth()
-                .padding(5.dp)
                 .padding(10.dp)
                 .clickable {
                     viewModel.onEvent(TouchBaseEvent.ProfileSelected(contact.id))
@@ -97,7 +100,7 @@ fun ContactItem(
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceEvenly
+                horizontalArrangement = Arrangement.SpaceAround
             ) {
                 Column(
                     horizontalAlignment = Alignment.Start,
@@ -105,12 +108,12 @@ fun ContactItem(
                     Text(
                         text = "${contact.firstName} ${contact.lastName}",
                         fontSize = 25.sp,
-                        fontWeight = FontWeight.Medium
+                        fontWeight = FontWeight.Normal
                     )
                     Text(
                         text = contact.relation.toString(),
                         fontSize = 20.sp,
-                        fontWeight = FontWeight.ExtraLight
+                        fontWeight = FontWeight.Normal
                     )
                 }
                 Column() {
@@ -145,15 +148,18 @@ fun RoundProfileImage(
         ) {
             val boxWidth = this.maxWidth
             Box(
-                modifier = Modifier.width(boxWidth)
+                modifier = Modifier
+                    .width(boxWidth)
             ) {
                 Image(
                     bitmap = image.asImageBitmap(),
                     contentDescription = null,
                     modifier = modifier
                         .aspectRatio(1f, matchHeightConstraintsFirst = true)
+                        .shadow(10.dp, CircleShape)
                         .padding(2.dp)
                         .clip(CircleShape)
+                        .background(Color.White)
                 )
             }
             Box (

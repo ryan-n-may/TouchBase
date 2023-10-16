@@ -19,7 +19,7 @@ import com.example.touchbase.viewmodel.TouchBaseViewModel
 @Composable
 fun EditContactScreen(navController: NavHostController, viewmodel: TouchBaseViewModel) {
     Scaffold(
-        topBar = { TitleBar("Edit Contact") },
+        topBar = { TitleBar("EDIT CONTACT") },
         floatingActionButton = {
             Row{
                 BackButton(navController = navController)

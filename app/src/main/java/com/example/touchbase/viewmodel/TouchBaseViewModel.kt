@@ -1,16 +1,34 @@
 package com.example.touchbase.viewmodel
 
+import android.Manifest
+import android.app.Activity
+import android.content.ContentResolver
 import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Picture
 import android.net.Uri
+import android.provider.ContactsContract
 import android.util.Log
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
+import androidx.core.app.ActivityCompat
+import androidx.core.app.ActivityCompat.startActivityForResult
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.room.Room
 import com.example.touchbase.R
@@ -21,16 +39,28 @@ import java.util.concurrent.Executors
 
 const val TAG = "TouchBaseViewModel"
 
-class TouchBaseViewModel(context: Context) : ViewModel() {
+class TouchBaseViewModel(
+    context: Context,
+    requestForCameraPermissionAgain: () -> Unit,
+    requestForContactPermissionAgain: () -> Unit,
+    ) : ViewModel() {
     private var db : CONTACT_DATABASE
     private var dao : CONTACT_DAO
     private lateinit var dd : DatabaseDriver
     private lateinit var context : Context
     lateinit var cameraExecute : ExecutorService
     /**
+     * Callbacks to re-request permissions
+     */
+    lateinit var requestForCameraPermissionAgain : () -> Unit
+    lateinit var requestForContactPermissionAgain : () -> Unit
+    lateinit var syncActivity : Activity
+
+    /**
      * Mutable state for contact list
      */
     var touchBaseContactList    = mutableStateListOf<Contact>()
+    var mobileContactList       = mutableStateListOf<Contact>()
 
     /**
      * Mutable state for field list
@@ -65,6 +95,8 @@ class TouchBaseViewModel(context: Context) : ViewModel() {
     var currentContactField     = mutableStateOf(SimpleField(Titles.NA, ""))
 
 
+    var test = mutableStateOf("")
+
     init {
         Log.v(TAG,"TouchBase Viewmodel Loaded")
         // Makes Database
@@ -78,6 +110,8 @@ class TouchBaseViewModel(context: Context) : ViewModel() {
         this.dd = DatabaseDriver(this.db)
         this.refreshContactList()
         this.currentContactFieldList.clear()
+        this.requestForCameraPermissionAgain = requestForCameraPermissionAgain
+        this.requestForContactPermissionAgain = requestForContactPermissionAgain
     }
 
     fun onEvent(event: TouchBaseEvent){
@@ -120,6 +154,14 @@ class TouchBaseViewModel(context: Context) : ViewModel() {
                 this.editContactField()
                 this.refreshContactFields()
             }
+            TouchBaseEvent.SyncContacts -> {
+                Log.v(TAG, "Syncing mobile contacts")
+                this.syncMobileContacts(this.syncActivity)
+                this.refreshContactList()
+            }
+            is TouchBaseEvent.CurrentActivity -> {
+                this.syncActivity = event.activity
+            }
             is TouchBaseEvent.ProfileSelected -> {
                 Log.v(TAG,"Profile Selected -> Id=${event.id}")
                 this.currentContactID.value = event.id
@@ -132,6 +174,73 @@ class TouchBaseViewModel(context: Context) : ViewModel() {
             else -> Log.e(TAG, "UNKNOWN EVENT: ${event}")
         }
     }
+
+    private fun syncMobileContacts(activity: Activity) : Boolean {
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.READ_CONTACTS) ==
+            PackageManager.PERMISSION_GRANTED) {
+
+            val builder = StringBuilder()
+            val resolver : ContentResolver = activity.contentResolver;
+            val cursor = resolver.query(
+                ContactsContract.Contacts.CONTENT_URI, null, null, null, null)
+            if(cursor == null){
+                Log.e(TAG,"ERROR: cursor is null accessing contacts.")
+            }else if(cursor.count > 0){
+                while(cursor.moveToNext()) {
+                    val NAME_COL_INDEX = cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME)
+                    val PHONE_COL_INDEX = cursor.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER)
+                    val ID_COL_INDEX = cursor.getColumnIndex(ContactsContract.Contacts._ID)
+                    var ID : String = ""
+                    var NAME : String = ""
+                    var PHONE : Int = 0
+                    if(NAME_COL_INDEX > 0 && PHONE_COL_INDEX > 0){
+                        ID = cursor.getString(ID_COL_INDEX)
+                        NAME = cursor.getString(NAME_COL_INDEX)
+                        PHONE = cursor.getString(PHONE_COL_INDEX).toInt()
+                    }
+                    if(PHONE > 0){
+                        val cursorPhone = activity.contentResolver.query(
+                            ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+                            null,
+                            ContactsContract.CommonDataKinds.Phone.CONTACT_ID + "=?",
+                            arrayOf(ID), null
+                        )
+                        if(cursorPhone != null && cursorPhone.count > 0){
+                            while(cursorPhone.moveToNext()){
+                                val cursorPhoneIndex = cursorPhone.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)
+                                if(cursorPhoneIndex != -1){
+                                    val db = ContextCompat.getDrawable(context, R.drawable.anna)
+                                    val bit = Bitmap.createBitmap(
+                                        db!!.intrinsicWidth, db.intrinsicHeight, Bitmap.Config.ARGB_8888
+                                    )
+                                    val phoneNumValue = cursorPhone.getString(cursorPhoneIndex)
+                                    val id = this.dd.addNewContact(NAME, "", bit, Relation.Other)
+                                    val newField = SimpleField(Titles.Mobile, phoneNumValue.toString())
+                                    this.dd.addNewContactField(id!!, newField)
+                                    /*builder.append("Contact: ").append(NAME).append(", Phone Number: ").append(
+                                        phoneNumValue).append("\n\n")*/
+                                }
+                            }
+                            cursorPhone.close()
+                            this.refreshContactList()
+                            return true
+                        }
+                    } else {
+                        Log.e(TAG, "No Phone Available")
+                        return false
+                    }
+                }
+                cursor.close()
+                this.refreshContactList()
+                return true
+            }
+        } else {
+            // if permission not granted requesting permission .
+            this.requestForContactPermissionAgain()
+            return false
+        }
+        return false
+    }
     private fun updatePicture(){
         Log.d(TAG, "Updating picture.")
         this.dd.updateContactImage(this.currentContactID.value, this.newContactImage.value)
@@ -141,6 +250,7 @@ class TouchBaseViewModel(context: Context) : ViewModel() {
         this.dd.deleteContactField(this.currentContactID.value, this.currentContactField.value)
         this.refreshContactFields()
     }
+
     private fun addContactField(){
         val newField = SimpleField(
             this.newFieldTitle.value,
@@ -151,7 +261,7 @@ class TouchBaseViewModel(context: Context) : ViewModel() {
         this.dd.logContactFields("Database", this.currentContactID.value)
     }
 
-    private fun refreshContactFields(){
+    fun refreshContactFields(){
         this.currentContactFieldList = mutableStateListOf()
         this.currentContactFieldList.clear()
         this.dd.getContactFields(this.currentContactID.value).forEach {
@@ -172,7 +282,7 @@ class TouchBaseViewModel(context: Context) : ViewModel() {
         Log.d(TAG, "Added contact via database DAO.")
     }
 
-    private fun refreshContactList(){
+    fun refreshContactList(){
         this.touchBaseContactList = mutableStateListOf()
         this.touchBaseContactList.clear()
         this.dd.getContactList().forEach {
@@ -222,4 +332,6 @@ class TouchBaseViewModel(context: Context) : ViewModel() {
     fun handleImageError(e : Exception){
 
     }
+
+
 }

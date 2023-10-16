@@ -60,7 +60,11 @@ class MainActivity : ComponentActivity() {
                     modelClass: Class<T>,
                     extras: CreationExtras
                 ): T {
-                    return TouchBaseViewModel(applicationContext) as T
+                    return TouchBaseViewModel(
+                        applicationContext,
+                        this@MainActivity::requestCameraPermission,
+                        this@MainActivity::requestContactPermission
+                    ) as T
                 }
             }
         }
@@ -77,6 +81,8 @@ class MainActivity : ComponentActivity() {
         }
 
         requestCameraPermission()
+        requestContactPermission()
+
     }
 
     private fun requestCameraPermission(){
@@ -90,6 +96,21 @@ class MainActivity : ComponentActivity() {
             }
 
             else -> requestPermissionLauncher.launch(Manifest.permission.CAMERA)
+        }
+    }
+
+
+    private fun requestContactPermission(){
+        when{
+            ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED -> {
+                Log.d(TAG, "Permission to camera already granted.");
+            }
+
+            ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_CONTACTS) == true -> {
+                Log.d(TAG, "Show camera permissions dialog");
+            }
+
+            else -> requestPermissionLauncher.launch(Manifest.permission.READ_CONTACTS)
         }
     }
 

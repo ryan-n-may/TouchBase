@@ -19,7 +19,7 @@ import com.example.touchbase.viewmodel.TouchBaseViewModel
 @Composable
 fun NewContactsScreen(navController: NavHostController, viewmodel: TouchBaseViewModel) {
     Scaffold(
-        topBar = { TitleBar("New Contact") },
+        topBar = { TitleBar("NEW CONTACT") },
         floatingActionButton = { 
             Row{ 
                 BackButton(navController = navController)

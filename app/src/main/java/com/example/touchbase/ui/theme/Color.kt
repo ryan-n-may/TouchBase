@@ -2,12 +2,9 @@ package com.example.touchbase.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val DarkPrimary     = Color.Red
-val DarkSecondary   = Color.Green
-val DarkTertiary    = Color.Blue
-val DarkBackground  = Color.Yellow
-
-val LightPrimary    = Color.Red
-val LightSecondary  = Color.Green
-val LightTertiary   = Color.Blue
-val LightBackground  = Color.Yellow
+val DarkBlue    = Color(0xFF02111B)
+val LightGrey   = Color(0xFF3F4045)
+val DarkGrey    = Color(0xFF302924)
+val LightBlue   = Color(0xFF5D737E)
+val OffWhite    = Color(0xFFFCFCFC)
+val BlueWhite   = Color(0xFFE8ECEE)
